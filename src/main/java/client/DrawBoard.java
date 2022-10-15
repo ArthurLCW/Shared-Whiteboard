@@ -195,8 +195,8 @@ public class DrawBoard extends JPanel {
         String drawTypeStr = (String) jsonObject.get("drawType");
         JSONArray colorArray = (JSONArray) jsonObject.get("colorVec");
         int R = ((Long) colorArray.get(0)).intValue();
-        int G = ((Long) colorArray.get(0)).intValue();
-        int B = ((Long) colorArray.get(0)).intValue();
+        int G = ((Long) colorArray.get(1)).intValue();
+        int B = ((Long) colorArray.get(2)).intValue();
         Color color = new Color(R,G,B);
         JSONArray shapeVec = (JSONArray) jsonObject.get("shapeVec");
 

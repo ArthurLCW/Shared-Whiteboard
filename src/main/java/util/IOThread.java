@@ -17,8 +17,7 @@ public class IOThread extends Thread{
     public IOThread(int port, LinkedBlockingDeque<Socket> socketQueue, int timeout) throws IOException {
         this.timeout = timeout;
         this.socketQueue = socketQueue;
-        factory = ServerSocketFactory.getDefault();
-        serverSocket = factory.createServerSocket(port);
+        serverSocket = new ServerSocket(port);
     }
 
     public void shutDown() throws IOException {

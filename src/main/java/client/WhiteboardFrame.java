@@ -247,27 +247,39 @@ public class WhiteboardFrame extends JFrame {
             portServer = Integer.parseInt(args[1]);
             serverIP = InetAddress.getByName(args[2]);
             portMy = Integer.parseInt(args[3]);
+            System.out.println("First client connect: Username: " + username + " portServer: " + portServer +
+                    " serverIP: " + serverIP + " portMy: " + portMy);
+            System.out.println(serverIP.toString());
         } catch (ArrayIndexOutOfBoundsException e) {
             System.out.println("You are not passing parameters!");
         }
 
 
         // initial socket Connecting, ask for join in permission
-        Socket joinInSocket = new Socket(serverIP, portServer);
-        new SendJoinInRequest(joinInSocket, username, portMy);
+        InetAddress addr = InetAddress.getByName("172.26.130.185");
+        System.out.println(addr);
+        System.out.println(addr.toString());
+        System.out.println(addr.getHostName());
+        System.out.println(InetAddress.getByName(addr.getHostName()));
+        System.out.println(InetAddress.getByName(addr.getHostName()).toString());
+        // Socket joinInSocket = new Socket(serverIP, portServer);
 
-        // receive the full current ip/port/name tuples
-        // TODO: wxh may need to implement "deny" function (socket and ui).
+        try (Socket joinInSocket =
+                     new Socket(InetAddress.getByName(serverIP.getHostName()), portServer)) {
+            new SendJoinInRequest(joinInSocket, username, portMy);
+
+            // receive the full current ip/port/name tuples
+            // TODO: wxh may need to implement "deny" function (socket and ui).
 
 
-        socketQueue = new LinkedBlockingDeque<Socket>();
+            socketQueue = new LinkedBlockingDeque<Socket>();
 //        userList = new LinkedBlockingDeque<ID>();
 //        LinkedBlockingDeque<ID> xx = new LinkedBlockingDeque<ID>();
 
-        IOThread ioThread = new IOThread(portMy, socketQueue, timeout); // used to receive all sockets and store in a queue
-        ioThread.start();
-        WorkThread workThread = new WorkThread(pool, socketQueue, userList, drawBoard);
-        workThread.start();
+            IOThread ioThread = new IOThread(portMy, socketQueue, timeout); // used to receive all sockets and store in a queue
+            ioThread.start();
+            WorkThread workThread = new WorkThread(pool, socketQueue, userList, drawBoard);
+            workThread.start();
 //        WorkThread workThread = new WorkThread(pool, socketQueue, xx);
 //        workThread.start();
 
@@ -282,6 +294,8 @@ public class WhiteboardFrame extends JFrame {
 //                socket.close();
 //            }
 //        }
+        }
+
     }
 
     private void initWhiteBoard() {
