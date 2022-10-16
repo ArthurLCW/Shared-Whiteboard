@@ -28,7 +28,7 @@ public class Translator_IDQ_JSStr {
         }
         jsonObject.put("JsonArray", jsArray);
         String jsStr = jsonObject.toJSONString();
-        System.out.println("IDQueueJSONString jsStr: "+jsStr);
+        // System.out.println("IDQueueJSONString jsStr: "+jsStr);
         return jsStr;
     }
 
@@ -45,7 +45,7 @@ public class Translator_IDQ_JSStr {
                     ((Long) jsID.get("port")).intValue());
             vecID.add(id);
         }
-        System.out.println("IDQueueJSONString vecID: "+vecID);
+        // System.out.println("IDQueueJSONString vecID: "+vecID);
         return vecID;
     }
 }

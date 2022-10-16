@@ -6,6 +6,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import util.ID;
 import util.ShapeSender;
+import util.TextSender;
 
 import javax.swing.*;
 import java.awt.*;
@@ -58,8 +59,11 @@ public class DrawBoard extends JPanel {
                             "Text Entering Box", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE,
                             null, options, options[0]);
                     if (result==JOptionPane.OK_OPTION){
-                        System.out.println("Text: "+textInput.getText());
+                        // System.out.println("Text: "+textInput.getText()+" pos "+e.getX()+" "+e.getY());
                         graphics2D.drawString(textInput.getText(), e.getX(), e.getY());
+                        TextSender textSender = new TextSender(e.getX(),e.getY(),textInput.getText(),drawColor,
+                                userList, pool);
+                        textSender.sendText();
                         repaint();
                     }
                 }
@@ -77,7 +81,13 @@ public class DrawBoard extends JPanel {
                     posCur.boundaryCheckPos();
                     freeVec.add(new Position(posOld));
                     graphics2D.drawLine(posOld.getX(), posOld.getY(), posCur.getX(), posCur.getY());
-                    System.out.println("HandFree: "+ posOld.getX()+" "+ posOld.getY()+" "+ posCur.getX()+" "+ posCur.getY());
+                    // System.out.println("HandFree: "+ posOld.getX()+" "+ posOld.getY()+" "+ posCur.getX()+" "+ posCur.getY());
+                    Vector<Position> vec = new Vector<Position>();
+                    vec.add(new Position(posOld));
+                    vec.add(new Position(posCur));
+                    ShapeSender shapeSender = new ShapeSender(vec,drawColor,DrawType.Line, userList, pool);
+                    shapeSender.sendShape();
+
                     posOld.updateXY(posCur);
                     repaint();
                 }
@@ -97,7 +107,7 @@ public class DrawBoard extends JPanel {
                 if (drawType == DrawType.HandFree) {
                     posCur.setXY(e.getX(), e.getY());
                     freeVec.add(new Position(posCur));
-                    for (int i = 0; i< freeVec.size(); i++) System.out.println("In freeVec: "+ freeVec.elementAt(i).getX()+" "+ freeVec.elementAt(i).getY());
+                    // for (int i = 0; i< freeVec.size(); i++) System.out.println("In freeVec: "+ freeVec.elementAt(i).getX()+" "+ freeVec.elementAt(i).getY());
                     freeVec.clear();
                 }
                 else if (drawType == DrawType.Text) {}//TODO : implement This!
@@ -112,11 +122,12 @@ public class DrawBoard extends JPanel {
                         shapeVec.add(new Position(posThird));
                     }
 
-                    for (int i = 0; i< shapeVec.size(); i++) System.out.println("In shapeVec: "+ shapeVec.elementAt(i).getX()+" "+ shapeVec.elementAt(i).getY());
+                    // for (int i = 0; i< shapeVec.size(); i++) System.out.println("In shapeVec: "+ shapeVec.elementAt(i).getX()+" "+ shapeVec.elementAt(i).getY());
+                    ShapeSender shapeSender;
                     switch (drawType){
                         case Line:
                             graphics2D.drawLine(posStart.getX(), posStart.getY(), posEnd.getX(), posEnd.getY());
-                            ShapeSender shapeSender = new ShapeSender(shapeVec,drawColor,drawType, userList, pool);
+                            shapeSender = new ShapeSender(shapeVec,drawColor,drawType, userList, pool);
                             shapeSender.sendShape();
                             shapeVec.clear();
                             break;
@@ -125,6 +136,8 @@ public class DrawBoard extends JPanel {
                             int CircleCentreY = (posStart.getY()+posEnd.getY())/2;
                             int diameter = (int)posStart.distance(posEnd);
                             graphics2D.drawOval(CircleCentreX-diameter/2, CircleCentreY-diameter/2, diameter, diameter);
+                            shapeSender = new ShapeSender(shapeVec,drawColor,drawType, userList, pool);
+                            shapeSender.sendShape();
                             shapeVec.clear();
                             break;
                         case Triangle:
@@ -135,12 +148,16 @@ public class DrawBoard extends JPanel {
                                         shapeVec.elementAt(2).getX(), shapeVec.elementAt(2).getY());
                                 graphics2D.drawLine(shapeVec.elementAt(1).getX(), shapeVec.elementAt(1).getY(),
                                         shapeVec.elementAt(2).getX(), shapeVec.elementAt(2).getY());
+                                shapeSender = new ShapeSender(shapeVec,drawColor,drawType, userList, pool);
+                                shapeSender.sendShape();
                                 shapeVec.clear();
                             }
                             break;
                         case Rectangle:
                             graphics2D.drawRect(Math.min(posStart.getX(), posEnd.getX()), Math.min(posStart.getY(), posEnd.getY()),
                                     Math.abs(posStart.getX()-posEnd.getX()), Math.abs(posStart.getY()-posEnd.getY()));
+                            shapeSender = new ShapeSender(shapeVec,drawColor,drawType, userList, pool);
+                            shapeSender.sendShape();
                             shapeVec.clear();
                             break;
                         }
@@ -155,22 +172,19 @@ public class DrawBoard extends JPanel {
             ////////////////////////
             image = createImage(getSize().width, getSize().height);
             graphics2D = (Graphics2D) image.getGraphics();
-            System.out.println("IN Drawboard xxxxxxxxxxxxxxxxx graphics2d null: " + graphics2D);
-
-
             System.out.println("Init type: "+drawType.toString());
             // clear();
         }
         graphics.drawImage(image, 0, 0, null);
     }
 
-    private void clear() {
-        graphics2D.setPaint(Color.white);
-        graphics2D.fillRect(0, 0, getSize().width, getSize().height);
-        repaint();
-        graphics2D.setPaint(Color.black);
-        System.out.println("clear board");
-    }
+//    private void clear() {
+//        graphics2D.setPaint(Color.white);
+//        graphics2D.fillRect(0, 0, getSize().width, getSize().height);
+//        repaint();
+//        graphics2D.setPaint(Color.black);
+//        System.out.println("clear board");
+//    }
 
     public void setType(DrawType drawType){
         this.drawType = drawType;
@@ -182,16 +196,11 @@ public class DrawBoard extends JPanel {
     public void setColor(Color color){
         this.drawColor = color;
         graphics2D.setColor(drawColor);
-
         System.out.println("Draw color is set to be "+drawColor.getRed()+" "+drawColor.getGreen()+" "+drawColor.getBlue());
     }
 
-    public Graphics2D getGraphics2D(){
-        System.out.println("IN Drawboard graphics2d null: " + graphics2D);
-        return graphics2D;
-    }
 
-    public void drawOthersPainting(JSONObject jsonObject) throws ParseException {
+    public void receiveShape(JSONObject jsonObject) throws ParseException {
         String drawTypeStr = (String) jsonObject.get("drawType");
         JSONArray colorArray = (JSONArray) jsonObject.get("colorVec");
         int R = ((Long) colorArray.get(0)).intValue();
@@ -220,7 +229,46 @@ public class DrawBoard extends JPanel {
                 g2Temp.drawLine(vecP.elementAt(0).getX(), vecP.elementAt(0).getY(),
                         vecP.elementAt(1).getX(), vecP.elementAt(1).getY());
                 break;
+            case "\"Circle\"":
+                int CircleCentreX = (vecP.elementAt(0).getX()+vecP.elementAt(1).getX())/2;
+                int CircleCentreY = (vecP.elementAt(0).getY()+vecP.elementAt(1).getY())/2;
+                int diameter = (int)vecP.elementAt(0).distance(vecP.elementAt(1));
+                g2Temp.drawOval(CircleCentreX-diameter/2, CircleCentreY-diameter/2, diameter, diameter);
+                break;
+            case "\"Rectangle\"":
+                g2Temp.drawRect(Math.min(vecP.elementAt(0).getX(), vecP.elementAt(1).getX()),
+                        Math.min(vecP.elementAt(0).getY(), vecP.elementAt(1).getY()),
+                        Math.abs(vecP.elementAt(0).getX()-vecP.elementAt(1).getX()),
+                        Math.abs(vecP.elementAt(0).getY()-vecP.elementAt(1).getY()));
+                break;
+            case "\"Triangle\"":
+                g2Temp.drawLine(vecP.elementAt(0).getX(), vecP.elementAt(0).getY(),
+                        vecP.elementAt(1).getX(), vecP.elementAt(1).getY());
+                g2Temp.drawLine(vecP.elementAt(0).getX(), vecP.elementAt(0).getY(),
+                        vecP.elementAt(2).getX(), vecP.elementAt(2).getY());
+                g2Temp.drawLine(vecP.elementAt(1).getX(), vecP.elementAt(1).getY(),
+                        vecP.elementAt(2).getX(), vecP.elementAt(2).getY());
+                break;
         }
         repaint();
     }
+
+    public void receiveText(JSONObject jsonObject) throws ParseException{
+        JSONArray colorArray = (JSONArray) jsonObject.get("colorVec");
+        int R = ((Long) colorArray.get(0)).intValue();
+        int G = ((Long) colorArray.get(1)).intValue();
+        int B = ((Long) colorArray.get(2)).intValue();
+        Color color = new Color(R,G,B);
+        int posX = Integer.parseInt(jsonObject.get("posX").toString());
+        int posY = Integer.parseInt(jsonObject.get("posY").toString());
+        String str = (String) jsonObject.get("str");
+        // System.out.println("receiveText: "+posX+" "+posY+" "+R+" "+G+" "+B+" "+str);
+
+        Graphics2D g2Temp = (Graphics2D) image.getGraphics();
+        g2Temp.setColor(color);
+        g2Temp.drawString(str, posX, posY);
+        repaint();
+    }
+
+
 }

@@ -34,7 +34,7 @@ public class IOThread extends Thread{
                 socketQueue.add(socket);
                 System.out.println("Server: IOThread: receive socket");
             } catch (IOException e) {
-                System.out.println("Server: IOThread: "+e.getStackTrace());
+                System.out.println("Server: IOThread: "+e.toString());
                 break;
             }
         }

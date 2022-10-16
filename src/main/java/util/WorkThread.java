@@ -31,9 +31,7 @@ public class WorkThread extends Thread{
             while (!socketQueue.isEmpty()){
                 Socket tempSocket = socketQueue.pop();
                 try {
-                    System.out.println("WorkThread: (before) userList size: "+userList.size());
                     new PeerReceiveSocket(tempSocket, userList, drawBoard, pool);
-                    System.out.println("WorkThread: (after) userList size: "+userList.size());
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 } catch (ParseException e) {

@@ -18,6 +18,8 @@ import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -58,8 +60,8 @@ public class WhiteboardFrame extends JFrame {
 
 
     // user info
-    private static int portServer = 4321;
-    private static int portMy = 3200;
+    private static int portServer = 3200;
+    private static int portMy = 3201;
     private static String username = "admin";
     private static InetAddress serverIP;
     private static int timeout = 1000;
@@ -184,9 +186,6 @@ public class WhiteboardFrame extends JFrame {
         userList = new LinkedBlockingDeque<ID>();
         pool = Executors.newFixedThreadPool(MAX_T);
 
-//        image = createImage(800, 650); // 800 650
-//        graphics2D = (Graphics2D) image.getGraphics();
-
         drawBoard = new DrawBoard(pool, userList);
         DrawPanel = drawBoard;
     }
@@ -219,11 +218,6 @@ public class WhiteboardFrame extends JFrame {
 
         colorChosenBackPanel.add(colorChosenBackPanel0, 0, 0);
         colorChosenBackPanel.add(colorChosenBackPanel1, 1, 1);
-
-//        System.out.println("IF graphics2d null: " + graphics2D);
-//        graphics2D = drawBoard.getGraphics2D();
-//        System.out.println("IF graphics2d null: " + graphics2D);
-//        graphics2D.drawLine(0, 0, 100, 100);
     }
 
     int checkColorIndex(Color color) {
@@ -238,6 +232,7 @@ public class WhiteboardFrame extends JFrame {
     }
 
     public static void main(String[] args) throws IOException {
+        SimpleDateFormat ft = new SimpleDateFormat("hh:mm:ss");
         WhiteboardFrame frame = new WhiteboardFrame("Shared Whiteboard");
         frame.setVisible(true);
         System.out.println("Main len: " + args.length);
@@ -249,53 +244,28 @@ public class WhiteboardFrame extends JFrame {
             portMy = Integer.parseInt(args[3]);
             System.out.println("First client connect: Username: " + username + " portServer: " + portServer +
                     " serverIP: " + serverIP + " portMy: " + portMy);
-            System.out.println(serverIP.toString());
         } catch (ArrayIndexOutOfBoundsException e) {
-            System.out.println("You are not passing parameters!");
+            System.out.println(e.toString());
         }
 
 
         // initial socket Connecting, ask for join in permission
-        InetAddress addr = InetAddress.getByName("172.26.130.185");
-        System.out.println(addr);
-        System.out.println(addr.toString());
-        System.out.println(addr.getHostName());
-        System.out.println(InetAddress.getByName(addr.getHostName()));
-        System.out.println(InetAddress.getByName(addr.getHostName()).toString());
-        // Socket joinInSocket = new Socket(serverIP, portServer);
+//        System.out.println(InetAddress.getByName(serverIP.getHostName()));
+        Socket joinInSocket = new Socket(InetAddress.getByName(serverIP.getHostName()), portServer);
+        new SendJoinInRequest(joinInSocket, username, portMy);
 
-        try (Socket joinInSocket =
-                     new Socket(InetAddress.getByName(serverIP.getHostName()), portServer)) {
-            new SendJoinInRequest(joinInSocket, username, portMy);
-
-            // receive the full current ip/port/name tuples
-            // TODO: wxh may need to implement "deny" function (socket and ui).
+        // receive the full current ip/port/name tuples
+        // TODO: wxh may need to implement "deny" function (socket and ui).
 
 
-            socketQueue = new LinkedBlockingDeque<Socket>();
+        socketQueue = new LinkedBlockingDeque<Socket>();
 //        userList = new LinkedBlockingDeque<ID>();
 //        LinkedBlockingDeque<ID> xx = new LinkedBlockingDeque<ID>();
 
-            IOThread ioThread = new IOThread(portMy, socketQueue, timeout); // used to receive all sockets and store in a queue
-            ioThread.start();
-            WorkThread workThread = new WorkThread(pool, socketQueue, userList, drawBoard);
-            workThread.start();
-//        WorkThread workThread = new WorkThread(pool, socketQueue, xx);
-//        workThread.start();
-
-//        while (true) {
-//            while (!socketQueue.isEmpty()) {
-//                System.out.println("Server do");
-//                Socket socket = socketQueue.pop();
-//                DataInputStream input = new DataInputStream(socket.getInputStream());
-//                DataOutputStream output = new DataOutputStream(socket.getOutputStream());
-//                String message = input.readUTF();
-//                System.out.println("SocketTask received input: " + message);
-//                socket.close();
-//            }
-//        }
-        }
-
+        IOThread ioThread = new IOThread(portMy, socketQueue, timeout); // used to receive all sockets and store in a queue
+        ioThread.start();
+        WorkThread workThread = new WorkThread(pool, socketQueue, userList, drawBoard);
+        workThread.start();
     }
 
     private void initWhiteBoard() {

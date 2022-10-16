@@ -3,7 +3,7 @@ package util;
 import client.DrawType;
 import client.Position;
 import tasks.SendShape;
-import util.ID;
+import tasks.SendText;
 
 import java.awt.*;
 import java.util.Iterator;

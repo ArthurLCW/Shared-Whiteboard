@@ -47,7 +47,6 @@ public class PeerReceiveSocket {
         if (Objects.equals(MsgName, "UpdateSendUsers")){
             Translator_IDQ_JSStr translator = new Translator_IDQ_JSStr();
             Vector<ID> vecID = translator.StrToVec(message);
-            System.out.println("Peer: receive vecSize: "+vecID.size());
 
             /** update userList according to vecID */
 //            LinkedBlockingDeque<ID> IDQTemp = new LinkedBlockingDeque<ID>();
@@ -63,15 +62,14 @@ public class PeerReceiveSocket {
             for (int i=0; i<vecID.size(); i++){
                 userList.add(vecID.elementAt(i));
             }
-            System.out.println(userList);
-            System.out.println(userList.size());
+            System.out.println("Peer userList size: "+userList.size());
         }
-        else if (Objects.equals(MsgName, "SendShape")){
+        else if ((Objects.equals(MsgName, "SendShape")) || (Objects.equals(MsgName, "SendText"))){
             // drawBoard.getGraphics2D();
             // drawBoard.drawOthersPainting(command);
             pool.submit(new SyncDraw(command, drawBoard));
 
-            System.out.println("Peers!");
+            System.out.println("Peers sending!");
         }
 
     }
