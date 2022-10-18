@@ -13,14 +13,14 @@ import java.util.Objects;
 import java.util.concurrent.LinkedBlockingDeque;
 
 
-public class ServerReceiveSockets {
+public class ServerSocketReceiver {
     private Socket socket;
     private String MsgName;
     private JSONObject command;
     private LinkedBlockingDeque<ID> userList;
 
 
-    public ServerReceiveSockets(Socket socket, LinkedBlockingDeque<ID> userList) throws IOException, ParseException {
+    public ServerSocketReceiver(Socket socket, LinkedBlockingDeque<ID> userList) throws IOException, ParseException {
         this.socket = socket;
         this.userList = userList;
         DataInputStream input = new DataInputStream(socket.getInputStream());
@@ -29,11 +29,9 @@ public class ServerReceiveSockets {
         JSONParser parser = new JSONParser();
         command = (JSONObject) parser.parse(message);
         MsgName = (String) command.get("MsgName");
-
-        react();
     }
 
-    public void react() throws IOException {
+    public void response() throws IOException {
         if (Objects.equals(MsgName, "SendJoinInRequest")){
             UpdatedUserListSender updatedUserListSender = new UpdatedUserListSender(socket, command, userList);
             updatedUserListSender.sendUpdates();

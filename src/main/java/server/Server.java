@@ -2,7 +2,7 @@ package server;
 import org.json.simple.parser.ParseException;
 import util.ID;
 import util.IOThread;
-import util.ServerReceiveSockets;
+import util.ServerSocketReceiver;
 
 import java.net.InetAddress;
 import java.io.IOException;
@@ -45,7 +45,8 @@ public class Server {
             while (!socketQueue.isEmpty()) {
                 System.out.println("Server: received a connection!!! "+ft.format(new Date()));
                 Socket socket = socketQueue.pop();
-                new ServerReceiveSockets(socket, userList);
+                ServerSocketReceiver serverSocketReceiver = new ServerSocketReceiver(socket, userList);
+                serverSocketReceiver.response();
                 System.out.println("Server: after execution, userList size: " + userList.size()+" " +ft.format(new Date()));
                 socket.close();
             }
