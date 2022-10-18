@@ -5,7 +5,7 @@ import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
 import util.ID;
 import util.IOThread;
-import tasks.SendJoinInRequest;
+import tasks.JoinInRequestSender;
 import util.WorkThread;
 
 import javax.swing.*;
@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -252,7 +251,8 @@ public class WhiteboardFrame extends JFrame {
         // initial socket Connecting, ask for join in permission
 //        System.out.println(InetAddress.getByName(serverIP.getHostName()));
         Socket joinInSocket = new Socket(InetAddress.getByName(serverIP.getHostName()), portServer);
-        new SendJoinInRequest(joinInSocket, username, portMy);
+        JoinInRequestSender joinInRequestSender = new JoinInRequestSender(joinInSocket, username, portMy);
+        joinInRequestSender.send();
 
         // receive the full current ip/port/name tuples
         // TODO: wxh may need to implement "deny" function (socket and ui).

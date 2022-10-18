@@ -7,18 +7,19 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 
-public class SendJoinInRequest {
+public class JoinInRequestSender {
     private String username;
     private int userServerPort;
     private JSONObject jsonObject;
     private Socket socket;
 
-    public SendJoinInRequest(Socket socket, String username, int userServerPort) throws IOException {
+    public JoinInRequestSender(Socket socket, String username, int userServerPort) {
         jsonObject = new JSONObject();
         this.username = username;
         this.userServerPort = userServerPort;
         this.socket = socket;
-        
+    }
+    public void send() throws IOException {
         DataInputStream input = new DataInputStream(socket.getInputStream());
         DataOutputStream output = new DataOutputStream(socket.getOutputStream());
         output.writeUTF(encode());

@@ -3,8 +3,7 @@ package util;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import tasks.UpdateSendUsers;
-import util.ID;
+import tasks.UpdatedUserListSender;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -36,7 +35,8 @@ public class ServerReceiveSockets {
 
     public void react() throws IOException {
         if (Objects.equals(MsgName, "SendJoinInRequest")){
-            new UpdateSendUsers(socket, command, userList);
+            UpdatedUserListSender updatedUserListSender = new UpdatedUserListSender(socket, command, userList);
+            updatedUserListSender.sendUpdates();
         }
     }
 
