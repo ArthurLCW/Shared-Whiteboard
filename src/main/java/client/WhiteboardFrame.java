@@ -5,7 +5,7 @@ import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
 import util.ID;
 import util.IOThread;
-import tasks.JoinInRequestSender;
+import util.JoinInRequestSender;
 import util.WorkThread;
 
 import javax.swing.*;
