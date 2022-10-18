@@ -2,8 +2,6 @@ package util;
 
 import client.DrawBoard;
 import org.json.simple.parser.ParseException;
-import util.ID;
-import util.PeerReceiveSocket;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -31,7 +29,8 @@ public class WorkThread extends Thread{
             while (!socketQueue.isEmpty()){
                 Socket tempSocket = socketQueue.pop();
                 try {
-                    new PeerReceiveSocket(tempSocket, userList, drawBoard, pool);
+                    PeerSocketReceiver peerSocketReceiver = new PeerSocketReceiver(tempSocket, userList, drawBoard, pool);
+                    peerSocketReceiver.response();
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 } catch (ParseException e) {
