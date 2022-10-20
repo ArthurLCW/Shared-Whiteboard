@@ -6,18 +6,12 @@ import com.intellij.uiDesigner.core.Spacer;
 import fileHandler.RecordReader;
 import fileHandler.RecordSaver;
 import org.json.simple.parser.ParseException;
-import util.ID;
-import util.IOThread;
-import util.JoinInRequestSender;
-import util.WorkThread;
+import util.*;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
@@ -77,6 +71,25 @@ public class WhiteboardFrame extends JFrame {
         this.pack();
         initWhiteBoard();
 
+        this.addWindowListener(new WindowAdapter()
+        {
+            @Override
+            public void windowClosing(WindowEvent e)
+            {
+                System.out.println("Closed!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                Socket leaveSocket = null;
+                try {
+                    leaveSocket = new Socket(InetAddress.getByName(serverIP.getHostName()), portServer);
+                    LeaveRequestSender leaveRequestSender = new LeaveRequestSender(leaveSocket, username, portMy);
+                    LeaveRequestSender.send();
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+
+
+                e.getWindow().dispose();
+            }
+        });
         FreeHandBtn.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {

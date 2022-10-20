@@ -34,6 +34,9 @@ public class ServerSocketReceiver {
         if (Objects.equals(MsgName, "SendJoinInRequest")){
             UpdatedUserListSender updatedUserListSender = new UpdatedUserListSender(socket, command, userList);
             updatedUserListSender.sendUpdates();
+        }else if (Objects.equals(MsgName, "SendLeaveRequest")){
+            UpdatedUserListSender updatedUserListSender = new UpdatedUserListSender(socket, command, userList);
+            updatedUserListSender.sendUpdates();
         }
     }
 

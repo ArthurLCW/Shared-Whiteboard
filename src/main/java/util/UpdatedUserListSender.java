@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.concurrent.LinkedBlockingDeque;
 
 /**
@@ -28,10 +29,28 @@ public class UpdatedUserListSender {
         InetAddress userIP = this.socket.getInetAddress();
         this.socket.close(); // close receive sockets
 
-        String username = (String) command.get("username");
-        int userServerPort = ((Long) command.get("userServerPort")).intValue();
-        ID id = new ID(username, userIP, userServerPort);
-        this.userList.add(id);
+
+        if (Objects.equals((String) command.get("MsgName"), "SendJoinInRequest")){
+            String username = (String) command.get("username");
+            int userServerPort = ((Long) command.get("userServerPort")).intValue();
+            ID id = new ID(username, userIP, userServerPort);
+            this.userList.add(id);
+        }
+        else if (Objects.equals((String) command.get("MsgName"), "SendLeaveRequest")){
+            String username = (String) command.get("username");
+            int userServerPort = ((Long) command.get("userServerPort")).intValue();
+            Iterator iteratorVals = this.userList.iterator();
+            while (iteratorVals.hasNext()){
+                ID id = (ID) iteratorVals.next();
+                if (Objects.equals(username,id.getUsername()) && userServerPort==id.getPort()){
+                    System.out.println("!!!!READY ");
+                    this.userList.remove(id);
+                }
+            }
+
+
+        }
+
     }
 
     public void sendUpdates() throws IOException {
