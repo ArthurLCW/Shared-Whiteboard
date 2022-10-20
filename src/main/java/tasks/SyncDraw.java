@@ -4,6 +4,7 @@ import client.DrawBoard;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 
+import java.io.IOException;
 import java.util.Objects;
 
 
@@ -26,6 +27,8 @@ public class SyncDraw implements Runnable{
             }
 
         } catch (ParseException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }

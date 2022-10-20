@@ -3,6 +3,9 @@ package client;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
+import fileHandler.RecordReader;
+import fileHandler.RecordSaver;
+import org.json.simple.parser.ParseException;
 import util.ID;
 import util.IOThread;
 import util.JoinInRequestSender;
@@ -230,7 +233,7 @@ public class WhiteboardFrame extends JFrame {
         return idx;
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, ParseException {
         SimpleDateFormat ft = new SimpleDateFormat("hh:mm:ss");
         WhiteboardFrame frame = new WhiteboardFrame("Shared Whiteboard");
         frame.setVisible(true);
@@ -246,6 +249,16 @@ public class WhiteboardFrame extends JFrame {
         } catch (ArrayIndexOutOfBoundsException e) {
             System.out.println(e.toString());
         }
+
+
+        // TODO: WXH: an example of how to save files, load files.
+        // not sure if loaded drawing needs to be seen by others too.....
+//        RecordSaver recordSaver = new RecordSaver("C:\\Users\\Arthu\\Desktop\\0.whiteboard", drawBoard.drawingRecord);
+//        int status = recordSaver.saveFile();
+//        RecordReader fileReader = new RecordReader("C:\\Users\\Arthu\\Desktop\\0.whiteboard");
+//        fileReader.readFile();
+//        drawBoard.loadDrawing(fileReader.getRecords());
+
 
 
         // initial socket Connecting, ask for join in permission
@@ -266,6 +279,8 @@ public class WhiteboardFrame extends JFrame {
         ioThread.start();
         WorkThread workThread = new WorkThread(pool, socketQueue, userList, drawBoard);
         workThread.start();
+
+
     }
 
     private void initWhiteBoard() {
