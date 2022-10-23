@@ -15,6 +15,7 @@ import java.awt.event.*;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -61,11 +62,21 @@ public class WhiteboardFrame extends JFrame {
     private static String username = "admin";
     private static InetAddress serverIP;
     private static int timeout = 1000;
+    private static JFrame frame;
+    private static ID managerInfo;
 
+    static {
+        try {
+            managerInfo = new ID("", InetAddress.getByName("localhost"), -1);
+        } catch (UnknownHostException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
-    public WhiteboardFrame(String appName) {
+    public WhiteboardFrame(String appName) throws UnknownHostException {
         super(appName);
         $$$setupUI$$$();
+        this.frame = this;
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setContentPane(WhiteboardPanel);
         this.pack();
@@ -82,6 +93,10 @@ public class WhiteboardFrame extends JFrame {
                     leaveSocket = new Socket(InetAddress.getByName(serverIP.getHostName()), portServer);
                     LeaveRequestSender leaveRequestSender = new LeaveRequestSender(leaveSocket, username, portMy);
                     LeaveRequestSender.send();
+                    System.out.println("manager?"+managerInfo.getUsername());
+//                    RecordSaver recordSaver = new RecordSaver("C:\\Users\\Arthu\\Desktop\\0.whiteboard", drawBoard.drawingRecord);
+//                    int status = recordSaver.saveFile();
+
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
                 }
@@ -246,10 +261,10 @@ public class WhiteboardFrame extends JFrame {
         return idx;
     }
 
-    public static void main(String[] args) throws IOException, ParseException {
+    public static void main(String[] args) throws IOException, ParseException, InterruptedException {
         SimpleDateFormat ft = new SimpleDateFormat("hh:mm:ss");
-        WhiteboardFrame frame = new WhiteboardFrame("Shared Whiteboard");
-        frame.setVisible(true);
+        WhiteboardFrame whiteboardFrame = new WhiteboardFrame("Shared Whiteboard");
+        whiteboardFrame.setVisible(true);
         System.out.println("Main len: " + args.length);
         try {
             serverIP = InetAddress.getByName("localhost");
@@ -257,7 +272,7 @@ public class WhiteboardFrame extends JFrame {
             portServer = Integer.parseInt(args[1]);
             serverIP = InetAddress.getByName(args[2]);
             portMy = Integer.parseInt(args[3]);
-            System.out.println("First client connect: Username: " + username + " portServer: " + portServer +
+            System.out.println("client connect: Username: " + username + " portServer: " + portServer +
                     " serverIP: " + serverIP + " portMy: " + portMy);
         } catch (ArrayIndexOutOfBoundsException e) {
             System.out.println(e.toString());
@@ -268,9 +283,12 @@ public class WhiteboardFrame extends JFrame {
         // not sure if loaded drawing needs to be seen by others too.....
 //        RecordSaver recordSaver = new RecordSaver("C:\\Users\\Arthu\\Desktop\\0.whiteboard", drawBoard.drawingRecord);
 //        int status = recordSaver.saveFile();
+
+        // file reader
 //        RecordReader fileReader = new RecordReader("C:\\Users\\Arthu\\Desktop\\0.whiteboard");
 //        fileReader.readFile();
 //        drawBoard.loadDrawing(fileReader.getRecords());
+//        System.out.println("Records size: "+drawBoard.drawingRecord.size());
 
 
 
@@ -284,16 +302,19 @@ public class WhiteboardFrame extends JFrame {
         // TODO: wxh may need to implement "deny" function (socket and ui).
 
 
+
         socketQueue = new LinkedBlockingDeque<Socket>();
 //        userList = new LinkedBlockingDeque<ID>();
 //        LinkedBlockingDeque<ID> xx = new LinkedBlockingDeque<ID>();
 
         IOThread ioThread = new IOThread(portMy, socketQueue, timeout); // used to receive all sockets and store in a queue
         ioThread.start();
-        WorkThread workThread = new WorkThread(pool, socketQueue, userList, drawBoard);
+        WorkThread workThread = new WorkThread(pool, socketQueue, userList, drawBoard, frame, managerInfo, serverIP, portServer);
         workThread.start();
 
-
+//        // TODO: wxh need to first deny/approve, then the client can request drawing record.
+//        DrawingRecordRequestSender drawingRecordRequestSender = new DrawingRecordRequestSender(userList);
+//        drawingRecordRequestSender.send();
     }
 
     private void initWhiteBoard() {

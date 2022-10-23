@@ -225,8 +225,8 @@ public class DrawBoard extends JPanel {
             vecP.add(pos);
         }
 
-        System.out.println("drawTypeStr: "+drawTypeStr+" color: "+R+" "+G+" "+B+" pos vec: "
-                +vecP.get(0).getX()+" "+vecP.get(0).getY()+" "+vecP.get(1).getX()+" "+vecP.get(1).getY());
+//        System.out.println("drawTypeStr: "+drawTypeStr+" color: "+R+" "+G+" "+B+" pos vec: "
+//                +vecP.get(0).getX()+" "+vecP.get(0).getY()+" "+vecP.get(1).getX()+" "+vecP.get(1).getY());
 
         Graphics2D g2Temp = (Graphics2D) image.getGraphics();
         g2Temp.setColor(color);
@@ -262,7 +262,7 @@ public class DrawBoard extends JPanel {
 
     public void receiveText(JSONObject jsonObject) throws ParseException{
         drawingRecord.add(jsonObject.toJSONString());
-        System.out.println("Drawing Record List length: "+drawingRecord.size());
+        // System.out.println("Drawing Record List length: "+drawingRecord.size());
         JSONArray colorArray = (JSONArray) jsonObject.get("colorVec");
         int R = ((Long) colorArray.get(0)).intValue();
         int G = ((Long) colorArray.get(1)).intValue();
