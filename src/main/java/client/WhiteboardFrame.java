@@ -309,7 +309,8 @@ public class WhiteboardFrame extends JFrame {
 
         IOThread ioThread = new IOThread(portMy, socketQueue, timeout); // used to receive all sockets and store in a queue
         ioThread.start();
-        WorkThread workThread = new WorkThread(pool, socketQueue, userList, drawBoard, frame, managerInfo, serverIP, portServer);
+        WorkThread workThread = new WorkThread(pool, socketQueue, userList, drawBoard, frame, managerInfo, serverIP,
+                portServer, drawBoard.drawingRecord);
         workThread.start();
 
 //        // TODO: wxh need to first deny/approve, then the client can request drawing record.

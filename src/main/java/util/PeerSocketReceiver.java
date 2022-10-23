@@ -1,6 +1,7 @@
 package util;
 
 import client.DrawBoard;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -14,6 +15,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Iterator;
 import java.util.Objects;
 import java.util.Vector;
 import java.util.concurrent.ExecutorService;
@@ -33,10 +35,12 @@ public class PeerSocketReceiver {
     private DataOutputStream output;
     private InetAddress serverIP;
     private int serverPort;
+    private LinkedBlockingDeque<String> drawingRecord;
 
 
     public PeerSocketReceiver(Socket socket, LinkedBlockingDeque<ID> userList, DrawBoard drawBoard,
-                              ExecutorService pool, JFrame frame, ID managerInfo, InetAddress serverIP, int serverPort)
+                              ExecutorService pool, JFrame frame, ID managerInfo, InetAddress serverIP, int serverPort,
+                              LinkedBlockingDeque<String> drawingRecord)
             throws IOException, ParseException {
         this.socket = socket;
         this.userList = userList;
@@ -46,6 +50,7 @@ public class PeerSocketReceiver {
         this.managerInfo = managerInfo;
         this.serverIP = serverIP;
         this.serverPort = serverPort;
+        this.drawingRecord = drawingRecord;
         input = new DataInputStream(socket.getInputStream());
         output = new DataOutputStream(socket.getOutputStream());
         message = input.readUTF();
@@ -75,7 +80,6 @@ public class PeerSocketReceiver {
         }
         else if ((Objects.equals(MsgName, "SendShape")) || (Objects.equals(MsgName, "SendText"))){
             pool.submit(new SyncDraw(command, drawBoard));
-
             System.out.println("Peers sending!");
         }
         else if (Objects.equals(MsgName, "PermissionRequest")){
@@ -104,6 +108,23 @@ public class PeerSocketReceiver {
                 DataOutputStream outputP = new DataOutputStream(permissionSocket.getOutputStream());
                 outputP.writeUTF(permitStr);
                 permissionSocket.close();
+
+                // P2P transmit history records
+                JSONObject sendRecords = new JSONObject();
+                sendRecords.put("MsgName", "SyncHistoryRecord");
+                JSONArray records = new JSONArray();
+
+                Iterator<String> iterator = drawingRecord.iterator();
+                while (iterator.hasNext()){
+                    String singleRecord = iterator.next();
+                    records.add(singleRecord);
+                }
+                sendRecords.put("DrawingRecord", records);
+                String sendRecordsStr = sendRecords.toJSONString();
+                Socket syncRecordSocket = new Socket(ip, userServerPort);
+                DataOutputStream outputS = new DataOutputStream(syncRecordSocket.getOutputStream());
+                outputS.writeUTF(sendRecordsStr);
+                syncRecordSocket.close();
             }
             else if (decision == JOptionPane.NO_OPTION) {
                 // tell the client he is rejected. close his window
@@ -128,10 +149,20 @@ public class PeerSocketReceiver {
         }
         else if (Objects.equals(MsgName, "Dismiss")){
             System.out.println("Peer: Dismiss");
-            int decision = JOptionPane.showConfirmDialog(frame, "Sorry! Manager left. The shared whiteboard dismissed. ",
+            int decision = JOptionPane.showConfirmDialog(frame, "Sorry! Manager left. The shared whiteboard is dismissed. ",
                     "Manager Message", JOptionPane.DEFAULT_OPTION);
             if (decision==JOptionPane.OK_OPTION){
                 frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+            }
+        }
+        else if (Objects.equals(MsgName, "SyncHistoryRecord")){
+            System.out.println("Peer: SyncHistoryRecord");
+            JSONParser parser = new JSONParser();
+            JSONArray records = (JSONArray) command.get("DrawingRecord");
+            for (int i=0; i<records.size(); i++){
+                String str = (String) records.get(i);
+                JSONObject jsobj = (JSONObject) parser.parse(str);
+                pool.submit(new SyncDraw(jsobj, drawBoard));
             }
         }
     }
