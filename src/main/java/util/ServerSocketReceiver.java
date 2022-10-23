@@ -18,10 +18,13 @@ public class ServerSocketReceiver {
     private JSONObject command;
     private LinkedBlockingDeque<ID> userList;
 
+    private ID manager;
 
-    public ServerSocketReceiver(Socket socket, LinkedBlockingDeque<ID> userList) throws IOException, ParseException {
+
+    public ServerSocketReceiver(Socket socket, LinkedBlockingDeque<ID> userList, ID manager) throws IOException, ParseException {
         this.socket = socket;
         this.userList = userList;
+        this.manager = manager;
         DataInputStream input = new DataInputStream(socket.getInputStream());
         DataOutputStream output = new DataOutputStream(socket.getOutputStream());
         String message = input.readUTF();
@@ -32,10 +35,22 @@ public class ServerSocketReceiver {
 
     public void response() throws IOException {
         if (Objects.equals(MsgName, "SendJoinInRequest")){
-            UpdatedUserListSender updatedUserListSender = new UpdatedUserListSender(socket, command, userList);
-            updatedUserListSender.sendUpdates();
+            if (userList.size()==0){
+                UpdatedUserListSender updatedUserListSender = new UpdatedUserListSender(socket, command, userList, manager);
+                updatedUserListSender.sendUpdates();
+            }
+            else{
+                PermissionRequestSender permissionRequestSender = new PermissionRequestSender(socket, command, manager);
+                permissionRequestSender.send();
+            }
+
         }else if (Objects.equals(MsgName, "SendLeaveRequest")){
-            UpdatedUserListSender updatedUserListSender = new UpdatedUserListSender(socket, command, userList);
+            UpdatedUserListSender updatedUserListSender = new UpdatedUserListSender(socket, command, userList, manager);
+            updatedUserListSender.sendUpdates();
+        }
+
+        else if (Objects.equals(MsgName, "GrantAccess")){
+            UpdatedUserListSender updatedUserListSender = new UpdatedUserListSender(socket, command, userList, manager);
             updatedUserListSender.sendUpdates();
         }
     }

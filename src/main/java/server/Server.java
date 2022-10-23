@@ -20,8 +20,11 @@ public class Server {
     private static InetAddress serverIP;
     private static int timeout = 1000;
 
+    private static ID manager;
+
 
     public static void main(String[] args) throws IOException, ParseException {
+        manager = new ID("default", InetAddress.getByName("localhost"), -1);
         SimpleDateFormat ft = new SimpleDateFormat("hh:mm:ss");
         System.out.println("Main len: " + args.length);
         try {
@@ -43,11 +46,12 @@ public class Server {
 
         while (true) {
             while (!socketQueue.isEmpty()) {
-                System.out.println("Server: received a connection!!! "+ft.format(new Date()));
+                System.out.println("Server: received a connection!!! ");
                 Socket socket = socketQueue.pop();
-                ServerSocketReceiver serverSocketReceiver = new ServerSocketReceiver(socket, userList);
+                ServerSocketReceiver serverSocketReceiver = new ServerSocketReceiver(socket, userList, manager);
                 serverSocketReceiver.response();
-                System.out.println("Server: after execution, userList size: " + userList.size()+" " +ft.format(new Date()));
+                System.out.println("Server: after execution, userList size: " + userList.size()+" manager name: " +
+                        manager.getUsername()+" ip: "+manager.getIP().toString()+" port: "+manager.getPort());
                 socket.close();
             }
         }

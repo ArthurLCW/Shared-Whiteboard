@@ -19,7 +19,7 @@ public class ID {
 
     public void setUsername(String username) {this.username = username;}
     public void setIP(InetAddress IP) {this.IP = IP;}
-    public void getPort(int port) {this.port = port;}
+    public void setPort(int port) {this.port = port;}
 
 
 }

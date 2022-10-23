@@ -17,6 +17,7 @@ client\DrawBoard.class
 client\WhiteboardFrame$3.class
 server\Server.class
 util\TextSender.class
+util\DrawingRecordRequestSender.class
 tasks\SendText.class
 client\WhiteboardFrame$6.class
 client\DrawType.class
@@ -29,5 +30,6 @@ util\JoinInRequestSender.class
 util\IOThread.class
 util\LeaveRequestSender.class
 util\ID.class
+util\PermissionRequestSender.class
 fileHandler\RecordReader.class
 util\WorkThread.class

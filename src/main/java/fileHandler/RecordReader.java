@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.LinkedBlockingDeque;
 
 public class RecordReader {
     private String pathname;
@@ -30,7 +31,9 @@ public class RecordReader {
         if (file0.exists()){
             System.out.println("FileReader: File exists! start reading");
             records = Files.readAllLines(file);
-            for (int i=0;i<records.size(); i++) System.out.println("records: "+records.get(i));
+            for (int i=0;i<records.size(); i++) {
+                // System.out.println("records: "+records.get(i));
+            }
             return 1;
         }
         else{
