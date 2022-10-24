@@ -11,6 +11,7 @@ util\PeerSocketReceiver.class
 client\Position.class
 client\DrawBoard$1.class
 util\ServerSocketReceiver.class
+tasks\SendChatMsg.class
 client\ManagerFlag.class
 tasks\SyncDraw.class
 client\WhiteboardFrame$8.class
@@ -29,8 +30,11 @@ client\RightBoard$1.class
 util\ShapeSender.class
 client\DrawBoard$3.class
 client\WhiteboardFrame$1.class
+util\ChatMsgSender.class
 client\WhiteboardFrame$4.class
+tasks\SyncChat.class
 util\JoinInRequestSender.class
+client\WhiteboardFrame$9.class
 util\IOThread.class
 util\LeaveRequestSender.class
 util\ID.class

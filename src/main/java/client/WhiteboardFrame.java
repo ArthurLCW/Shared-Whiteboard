@@ -85,7 +85,7 @@ public class WhiteboardFrame extends JFrame {
     private JScrollPane UserListPane;
     private JScrollPane ChatRoomPane;
     static private DefaultListModel userlistModel;
-    private DefaultListModel chatRoomListModel;
+    private static DefaultListModel chatRoomListModel;
 
     static {
         try {
@@ -127,6 +127,23 @@ public class WhiteboardFrame extends JFrame {
 
 
                 e.getWindow().dispose();
+            }
+        });
+        SendMsgButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                System.out.println("Clicked!!!!!!!!!!!!!!!!!");
+                String msg = MsgInput.getText();
+                if (msg.length()==0){
+                    JOptionPane.showMessageDialog(frame,
+                            "You have not typed anything. ");
+                }
+                else{
+                    ChatMsgSender chatMsgSender = new ChatMsgSender(userList, pool, username, msg);
+                    chatMsgSender.sendChatMsg();
+                    MsgInput.setText("");
+                }
             }
         });
         KickBtn.addMouseListener(new MouseAdapter() {
@@ -187,8 +204,6 @@ public class WhiteboardFrame extends JFrame {
                 }else{
                     JOptionPane.showMessageDialog(frame, "You are not manager. You cannot kick users.");
                 }
-
-
             }
         });
         FreeHandBtn.addMouseListener(new MouseAdapter() {
@@ -411,7 +426,7 @@ public class WhiteboardFrame extends JFrame {
         IOThread ioThread = new IOThread(portMy, socketQueue, timeout); // used to receive all sockets and store in a queue
         ioThread.start();
         WorkThread workThread = new WorkThread(pool, socketQueue, userList, drawBoard, frame, managerInfo, serverIP,
-                portServer, drawBoard.drawingRecord, userlistModel,managerFlag);
+                portServer, drawBoard.drawingRecord, userlistModel,managerFlag, chatRoomListModel);
         workThread.start();
 
 
@@ -566,7 +581,7 @@ public class WhiteboardFrame extends JFrame {
         SaveBtn.setText("Save");
         FilePanel.add(SaveBtn, new GridConstraints(0, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         SendMsgButton = new JButton();
-        SendMsgButton.setText("Button");
+        SendMsgButton.setText("Send");
         RightPanel.add(SendMsgButton, new GridConstraints(6, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, new Dimension(400, 25), new Dimension(400, 25), new Dimension(400, 50), 0, false));
         KickBtn = new JButton();
         KickBtn.setText("Kick");

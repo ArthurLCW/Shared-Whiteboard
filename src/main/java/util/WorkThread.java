@@ -24,11 +24,13 @@ public class WorkThread extends Thread{
     private LinkedBlockingDeque<String> drawingRecord;
     private DefaultListModel getUserlistModel;
     private ManagerFlag managerFlag;
+    private DefaultListModel chatRoomListModel;
+
 
     public WorkThread(ExecutorService pool, LinkedBlockingDeque<Socket> socketQueue, LinkedBlockingDeque<ID> userList,
                       DrawBoard drawBoard, JFrame frame, ID managerInfo, InetAddress serverIP, int serverPort,
                       LinkedBlockingDeque<String> drawingRecord, DefaultListModel getUserlistModel,
-                      ManagerFlag managerFlag){
+                      ManagerFlag managerFlag, DefaultListModel chatRoomListModel){
         this.pool = pool;
         this.socketQueue = socketQueue;
         this.userList = userList;
@@ -40,6 +42,7 @@ public class WorkThread extends Thread{
         this.drawingRecord = drawingRecord;
         this.getUserlistModel = getUserlistModel;
         this.managerFlag = managerFlag;
+        this.chatRoomListModel = chatRoomListModel;
     }
 
     @Override
@@ -49,7 +52,7 @@ public class WorkThread extends Thread{
                 Socket tempSocket = socketQueue.pop();
                 try {
                     PeerSocketReceiver peerSocketReceiver = new PeerSocketReceiver(tempSocket, userList, drawBoard, pool,
-                            frame, managerInfo, serverIP, serverPort, drawingRecord, getUserlistModel, managerFlag);
+                            frame, managerInfo, serverIP, serverPort, drawingRecord, getUserlistModel, managerFlag, chatRoomListModel);
                     peerSocketReceiver.response();
                 } catch (IOException e) {
                     throw new RuntimeException(e);

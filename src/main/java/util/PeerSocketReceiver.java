@@ -6,6 +6,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import tasks.SyncChat;
 import tasks.SyncDraw;
 
 import javax.swing.*;
@@ -38,13 +39,14 @@ public class PeerSocketReceiver {
     private int serverPort;
     private LinkedBlockingDeque<String> drawingRecord;
     private DefaultListModel getUserlistModel;
+    private DefaultListModel chatRoomListModel;
     private ManagerFlag managerFlag;
 
 
     public PeerSocketReceiver(Socket socket, LinkedBlockingDeque<ID> userList, DrawBoard drawBoard,
                               ExecutorService pool, JFrame frame, ID managerInfo, InetAddress serverIP, int serverPort,
                               LinkedBlockingDeque<String> drawingRecord, DefaultListModel getUserlistModel,
-                              ManagerFlag managerFlag)
+                              ManagerFlag managerFlag, DefaultListModel chatRoomListModel)
             throws IOException, ParseException {
         this.socket = socket;
         this.userList = userList;
@@ -57,6 +59,7 @@ public class PeerSocketReceiver {
         this.drawingRecord = drawingRecord;
         this.getUserlistModel = getUserlistModel;
         this.managerFlag = managerFlag;
+        this.chatRoomListModel =  chatRoomListModel;
         input = new DataInputStream(socket.getInputStream());
         output = new DataOutputStream(socket.getOutputStream());
         message = input.readUTF();
@@ -188,6 +191,10 @@ public class PeerSocketReceiver {
                 JSONObject jsobj = (JSONObject) parser.parse(str);
                 pool.submit(new SyncDraw(jsobj, drawBoard));
             }
+        }
+        else if ((Objects.equals(MsgName, "SendChatMsg"))){
+            pool.submit(new SyncChat(command, chatRoomListModel));
+            System.out.println("Peers sending!");
         }
     }
 }

@@ -1,8 +1,10 @@
 E:\graduate_study\COMP90015_Distributed\whiteboard\whiteboard\src\main\java\client\DrawType.java
+E:\graduate_study\COMP90015_Distributed\whiteboard\whiteboard\src\main\java\tasks\SyncChat.java
 E:\graduate_study\COMP90015_Distributed\whiteboard\whiteboard\src\main\java\util\PeerSocketReceiver.java
 E:\graduate_study\COMP90015_Distributed\whiteboard\whiteboard\src\main\java\tasks\SendText.java
 E:\graduate_study\COMP90015_Distributed\whiteboard\whiteboard\src\main\java\util\IOThread.java
 E:\graduate_study\COMP90015_Distributed\whiteboard\whiteboard\src\main\java\util\TextSender.java
+E:\graduate_study\COMP90015_Distributed\whiteboard\whiteboard\src\main\java\tasks\SendChatMsg.java
 E:\graduate_study\COMP90015_Distributed\whiteboard\whiteboard\src\main\java\util\PermissionRequestSender.java
 E:\graduate_study\COMP90015_Distributed\whiteboard\whiteboard\src\main\java\fileHandler\RecordSaver.java
 E:\graduate_study\COMP90015_Distributed\whiteboard\whiteboard\src\main\java\client\Position.java
@@ -12,6 +14,7 @@ E:\graduate_study\COMP90015_Distributed\whiteboard\whiteboard\src\main\java\util
 E:\graduate_study\COMP90015_Distributed\whiteboard\whiteboard\src\main\java\util\JoinInRequestSender.java
 E:\graduate_study\COMP90015_Distributed\whiteboard\whiteboard\src\main\java\util\ShapeSender.java
 E:\graduate_study\COMP90015_Distributed\whiteboard\whiteboard\src\main\java\tasks\SyncDraw.java
+E:\graduate_study\COMP90015_Distributed\whiteboard\whiteboard\src\main\java\util\ChatMsgSender.java
 E:\graduate_study\COMP90015_Distributed\whiteboard\whiteboard\src\main\java\util\Translator_IDQ_JSStr.java
 E:\graduate_study\COMP90015_Distributed\whiteboard\whiteboard\src\main\java\client\WhiteboardFrame.java
 E:\graduate_study\COMP90015_Distributed\whiteboard\whiteboard\src\main\java\util\WorkThread.java
