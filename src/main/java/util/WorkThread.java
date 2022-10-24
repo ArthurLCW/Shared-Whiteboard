@@ -1,6 +1,7 @@
 package util;
 
 import client.DrawBoard;
+import client.ManagerFlag;
 import org.json.simple.parser.ParseException;
 
 import javax.swing.*;
@@ -22,10 +23,12 @@ public class WorkThread extends Thread{
     private int serverPort;
     private LinkedBlockingDeque<String> drawingRecord;
     private DefaultListModel getUserlistModel;
+    private ManagerFlag managerFlag;
 
     public WorkThread(ExecutorService pool, LinkedBlockingDeque<Socket> socketQueue, LinkedBlockingDeque<ID> userList,
                       DrawBoard drawBoard, JFrame frame, ID managerInfo, InetAddress serverIP, int serverPort,
-                      LinkedBlockingDeque<String> drawingRecord, DefaultListModel getUserlistModel){
+                      LinkedBlockingDeque<String> drawingRecord, DefaultListModel getUserlistModel,
+                      ManagerFlag managerFlag){
         this.pool = pool;
         this.socketQueue = socketQueue;
         this.userList = userList;
@@ -36,6 +39,7 @@ public class WorkThread extends Thread{
         this.serverPort = serverPort;
         this.drawingRecord = drawingRecord;
         this.getUserlistModel = getUserlistModel;
+        this.managerFlag = managerFlag;
     }
 
     @Override
@@ -45,7 +49,7 @@ public class WorkThread extends Thread{
                 Socket tempSocket = socketQueue.pop();
                 try {
                     PeerSocketReceiver peerSocketReceiver = new PeerSocketReceiver(tempSocket, userList, drawBoard, pool,
-                            frame, managerInfo, serverIP, serverPort, drawingRecord, getUserlistModel);
+                            frame, managerInfo, serverIP, serverPort, drawingRecord, getUserlistModel, managerFlag);
                     peerSocketReceiver.response();
                 } catch (IOException e) {
                     throw new RuntimeException(e);

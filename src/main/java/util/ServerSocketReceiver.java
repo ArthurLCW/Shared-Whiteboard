@@ -53,6 +53,11 @@ public class ServerSocketReceiver {
             UpdatedUserListSender updatedUserListSender = new UpdatedUserListSender(socket, command, userList, manager);
             updatedUserListSender.sendUpdates();
         }
+
+        else if (Objects.equals(MsgName, "KickOut")){
+            UpdatedUserListSender updatedUserListSender = new UpdatedUserListSender(socket, command, userList, manager);
+            updatedUserListSender.sendUpdates();
+        }
     }
 
 

@@ -52,7 +52,7 @@ public class UpdatedUserListSender {
             String username = (String) command.get("username");
             int userServerPort = ((Long) command.get("userServerPort")).intValue();
 
-            if (Objects.equals(username, manager.getUsername()) && Objects.equals(userIP.getHostName(), manager.getIP().getHostName())
+            if (Objects.equals(username, manager.getUsername()) && Objects.equals(userIP.getHostAddress(), manager.getIP().getHostAddress())
             && (userServerPort == manager.getPort())){ // the manager runs!
                 managerRun = true;
             }
@@ -61,12 +61,29 @@ public class UpdatedUserListSender {
             Iterator iteratorVals = this.userList.iterator();
             while (iteratorVals.hasNext()){
                 ID id = (ID) iteratorVals.next();
-                if (Objects.equals(username,id.getUsername()) && userServerPort==id.getPort()){
+                if (Objects.equals(username,id.getUsername()) && Objects.equals(userIP,id.getIP())
+                        && userServerPort==id.getPort()){
                     this.userList.remove(id);
                 }
             }
 
         }
+
+        else if (Objects.equals((String) command.get("MsgName"), "KickOut")){
+            String username = (String) command.get("username");
+            int userServerPort = ((Long) command.get("userServerPort")).intValue();
+            InetAddress ip = InetAddress.getByName((String) command.get("userIP"));
+
+            Iterator iteratorVals = this.userList.iterator();
+            while (iteratorVals.hasNext()){
+                ID id = (ID) iteratorVals.next();
+                if (Objects.equals(username,id.getUsername()) && Objects.equals(ip,id.getIP())
+                        && userServerPort==id.getPort()){
+                    this.userList.remove(id);
+                }
+            }
+        }
+
         else if (Objects.equals((String) command.get("MsgName"), "GrantAccess")){
             String username = (String) command.get("username");
             int userServerPort = ((Long) command.get("userServerPort")).intValue();

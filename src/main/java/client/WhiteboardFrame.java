@@ -2,6 +2,7 @@ package client;
 
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
+import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 import util.*;
 
@@ -9,11 +10,14 @@ import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
+import java.util.Iterator;
+import java.util.Objects;
 import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -90,6 +94,7 @@ public class WhiteboardFrame extends JFrame {
             throw new RuntimeException(e);
         }
     }
+    private static ManagerFlag managerFlag;
 
     public WhiteboardFrame(String appName) throws UnknownHostException {
         super(appName);
@@ -122,6 +127,68 @@ public class WhiteboardFrame extends JFrame {
 
 
                 e.getWindow().dispose();
+            }
+        });
+        KickBtn.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                boolean iAmManager = managerFlag.getFlag();
+
+                if (iAmManager){
+                    int selectedIndex = -1;
+                    try{
+                        selectedIndex = userJList.getSelectedIndex();
+                    }finally {
+                        if (selectedIndex==-1){
+                            JOptionPane.showMessageDialog(frame, "You have not chosen a user. ");
+                        }else{
+                            if (selectedIndex==0){
+                                JOptionPane.showMessageDialog(frame, "You cannot kick yourself. ");
+                            }else{
+                                int decision = JOptionPane.showOptionDialog(frame,
+                                        "Are you sure you want to kick "+(String) userJList.getSelectedValue(),
+                                        "Kick Confirmation",
+                                        JOptionPane.YES_NO_OPTION,
+                                        JOptionPane.QUESTION_MESSAGE,
+                                        null,null,null); //default button title
+                                if (decision == JOptionPane.YES_OPTION){
+                                    ID id = null;
+                                    Iterator iteratorVals = userList.iterator();
+                                    for (int i=0; i<=selectedIndex; i++){
+                                        iteratorVals.hasNext();
+                                        id = (ID) iteratorVals.next();
+                                    }
+                                    try {
+                                        JSONObject jsonObject = new JSONObject();
+                                        jsonObject.put("MsgName", "KickOut");
+                                        String kickMsg = jsonObject.toJSONString();
+                                        Socket kickSocket = new Socket(id.getIP(), id.getPort());
+                                        DataOutputStream outputK = new DataOutputStream(kickSocket.getOutputStream());
+                                        outputK.writeUTF(kickMsg);
+                                        kickSocket.close();
+
+                                        jsonObject.put("username", id.getUsername());
+                                        jsonObject.put("userIP", id.getIP().getHostName());
+                                        jsonObject.put("userServerPort", id.getPort());
+                                        String kickServerMsg = jsonObject.toJSONString();
+                                        Socket kickServerSocket = new Socket(serverIP, portServer);
+                                        DataOutputStream outputSK = new DataOutputStream(kickServerSocket.getOutputStream());
+                                        outputSK.writeUTF(kickServerMsg);
+                                        kickServerSocket.close();
+
+                                    } catch (IOException ex) {
+                                        throw new RuntimeException(ex);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }else{
+                    JOptionPane.showMessageDialog(frame, "You are not manager. You cannot kick users.");
+                }
+
+
             }
         });
         FreeHandBtn.addMouseListener(new MouseAdapter() {
@@ -310,6 +377,7 @@ public class WhiteboardFrame extends JFrame {
         } catch (ArrayIndexOutOfBoundsException e) {
             System.out.println(e.toString());
         }
+        managerFlag = new ManagerFlag();
 
 
         // TODO: WXH: an example of how to save files, load files.
@@ -343,12 +411,10 @@ public class WhiteboardFrame extends JFrame {
         IOThread ioThread = new IOThread(portMy, socketQueue, timeout); // used to receive all sockets and store in a queue
         ioThread.start();
         WorkThread workThread = new WorkThread(pool, socketQueue, userList, drawBoard, frame, managerInfo, serverIP,
-                portServer, drawBoard.drawingRecord, userlistModel);
+                portServer, drawBoard.drawingRecord, userlistModel,managerFlag);
         workThread.start();
 
-//        // TODO: wxh need to first deny/approve, then the client can request drawing record.
-//        DrawingRecordRequestSender drawingRecordRequestSender = new DrawingRecordRequestSender(userList);
-//        drawingRecordRequestSender.send();
+
     }
 
     private void initWhiteBoard() {

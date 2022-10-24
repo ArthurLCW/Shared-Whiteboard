@@ -11,7 +11,9 @@ util\PeerSocketReceiver.class
 client\Position.class
 client\DrawBoard$1.class
 util\ServerSocketReceiver.class
+client\ManagerFlag.class
 tasks\SyncDraw.class
+client\WhiteboardFrame$8.class
 client\WhiteboardFrame.class
 util\Translator_IDQ_JSStr.class
 client\DrawBoard.class

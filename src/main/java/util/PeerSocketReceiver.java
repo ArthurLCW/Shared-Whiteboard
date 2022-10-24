@@ -1,6 +1,7 @@
 package util;
 
 import client.DrawBoard;
+import client.ManagerFlag;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -37,11 +38,13 @@ public class PeerSocketReceiver {
     private int serverPort;
     private LinkedBlockingDeque<String> drawingRecord;
     private DefaultListModel getUserlistModel;
+    private ManagerFlag managerFlag;
 
 
     public PeerSocketReceiver(Socket socket, LinkedBlockingDeque<ID> userList, DrawBoard drawBoard,
                               ExecutorService pool, JFrame frame, ID managerInfo, InetAddress serverIP, int serverPort,
-                              LinkedBlockingDeque<String> drawingRecord, DefaultListModel getUserlistModel )
+                              LinkedBlockingDeque<String> drawingRecord, DefaultListModel getUserlistModel,
+                              ManagerFlag managerFlag)
             throws IOException, ParseException {
         this.socket = socket;
         this.userList = userList;
@@ -53,6 +56,7 @@ public class PeerSocketReceiver {
         this.serverPort = serverPort;
         this.drawingRecord = drawingRecord;
         this.getUserlistModel = getUserlistModel;
+        this.managerFlag = managerFlag;
         input = new DataInputStream(socket.getInputStream());
         output = new DataOutputStream(socket.getOutputStream());
         message = input.readUTF();
@@ -68,8 +72,11 @@ public class PeerSocketReceiver {
             Vector<ID> vecID = translator.StrToVec(message);
 
             userList.clear();
+            getUserlistModel.clear();
             for (int i=0; i<vecID.size(); i++){
                 userList.add(vecID.elementAt(i));
+                getUserlistModel.addElement(vecID.elementAt(i).getUsername()+" "+vecID.elementAt(i).getIP()+" "+
+                        vecID.elementAt(i).getPort());
             }
             System.out.println("Peer userList size: "+userList.size());
             if ((userList.size()==1) && (managerInfo.getPort()==-1)){ // now the peer is the manager
@@ -78,12 +85,13 @@ public class PeerSocketReceiver {
                 managerInfo.setUsername(vecID.elementAt(0).getUsername());
                 managerInfo.setIP(vecID.elementAt(0).getIP());
                 managerInfo.setPort(vecID.elementAt(0).getPort());
+                managerFlag.setFlag(true);
             }
-            getUserlistModel.clear();
-            for (int i=0; i< vecID.size(); i++){
-                getUserlistModel.addElement(vecID.elementAt(i).getUsername()+" "+vecID.elementAt(i).getIP()+" "+
-                        vecID.elementAt(i).getPort());
-            }
+//            getUserlistModel.clear();
+//            for (int i=0; i< vecID.size(); i++){
+//                getUserlistModel.addElement(vecID.elementAt(i).getUsername()+" "+vecID.elementAt(i).getIP()+" "+
+//                        vecID.elementAt(i).getPort());
+//            }
 
         }
         else if ((Objects.equals(MsgName, "SendShape")) || (Objects.equals(MsgName, "SendText"))){
@@ -158,6 +166,14 @@ public class PeerSocketReceiver {
         else if (Objects.equals(MsgName, "Dismiss")){
             System.out.println("Peer: Dismiss");
             int decision = JOptionPane.showConfirmDialog(frame, "Sorry! Manager left. The shared whiteboard is dismissed. ",
+                    "Manager Message", JOptionPane.DEFAULT_OPTION);
+            if (decision==JOptionPane.OK_OPTION){
+                frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+            }
+        }
+        else if (Objects.equals(MsgName, "KickOut")){
+            System.out.println("Peer: KickOut");
+            int decision = JOptionPane.showConfirmDialog(frame, "Sorry! You are kicked out by manager. ",
                     "Manager Message", JOptionPane.DEFAULT_OPTION);
             if (decision==JOptionPane.OK_OPTION){
                 frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
