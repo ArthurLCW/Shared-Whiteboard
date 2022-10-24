@@ -8,6 +8,7 @@ E:\graduate_study\COMP90015_Distributed\whiteboard\whiteboard\src\main\java\task
 E:\graduate_study\COMP90015_Distributed\whiteboard\whiteboard\src\main\java\util\PermissionRequestSender.java
 E:\graduate_study\COMP90015_Distributed\whiteboard\whiteboard\src\main\java\fileHandler\RecordSaver.java
 E:\graduate_study\COMP90015_Distributed\whiteboard\whiteboard\src\main\java\client\Position.java
+E:\graduate_study\COMP90015_Distributed\whiteboard\whiteboard\src\main\java\tasks\SendClear.java
 E:\graduate_study\COMP90015_Distributed\whiteboard\whiteboard\src\main\java\tasks\SendShape.java
 E:\graduate_study\COMP90015_Distributed\whiteboard\whiteboard\src\main\java\client\RightBoard.java
 E:\graduate_study\COMP90015_Distributed\whiteboard\whiteboard\src\main\java\util\DrawingRecordRequestSender.java
@@ -25,4 +26,5 @@ E:\graduate_study\COMP90015_Distributed\whiteboard\whiteboard\src\main\java\util
 E:\graduate_study\COMP90015_Distributed\whiteboard\whiteboard\src\main\java\client\DrawBoard.java
 E:\graduate_study\COMP90015_Distributed\whiteboard\whiteboard\src\main\java\util\ID.java
 E:\graduate_study\COMP90015_Distributed\whiteboard\whiteboard\src\main\java\util\ServerSocketReceiver.java
+E:\graduate_study\COMP90015_Distributed\whiteboard\whiteboard\src\main\java\util\ClearSender.java
 E:\graduate_study\COMP90015_Distributed\whiteboard\whiteboard\src\main\java\fileHandler\RecordReader.java

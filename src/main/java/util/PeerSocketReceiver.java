@@ -196,5 +196,8 @@ public class PeerSocketReceiver {
             pool.submit(new SyncChat(command, chatRoomListModel));
             System.out.println("Peers sending!");
         }
+        else if ((Objects.equals(MsgName, "SendClear"))){
+            drawBoard.clear();
+        }
     }
 }

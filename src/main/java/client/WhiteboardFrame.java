@@ -2,8 +2,11 @@ package client;
 
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
+import fileHandler.RecordReader;
+import fileHandler.RecordSaver;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
+import tasks.SendClear;
 import util.*;
 
 import javax.swing.*;
@@ -11,11 +14,13 @@ import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.Objects;
 import java.util.Vector;
@@ -31,7 +36,6 @@ public class WhiteboardFrame extends JFrame {
     private JLabel DrawChoiceLabel;
     private JRadioButton TextBtn;
     private JRadioButton ShapeBtn;
-    private JRadioButton testBtn;
     private JComboBox ShapeCombo;
     private JPanel BottomPanel;
     private JPanel BottomSubPanel0;
@@ -40,7 +44,6 @@ public class WhiteboardFrame extends JFrame {
     private JComboBox ColorCombo;
     private JPanel DrawPanel;
     private JButton CustomizedColorButton;
-    private JButton button1;
 
     private DrawType drawType;
     private static DrawBoard drawBoard;
@@ -127,6 +130,93 @@ public class WhiteboardFrame extends JFrame {
 
 
                 e.getWindow().dispose();
+            }
+        });
+        SaveBtn.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                if (managerFlag.getFlag()){
+                    String path = System.getProperty("user.home") + "\\Desktop\\";
+                    path = path + new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss").format(new Date()) + ".whiteboard";
+                    System.out.println(path);
+                    RecordSaver recordSaver = new RecordSaver(path, drawBoard.drawingRecord);
+                    try {
+                        recordSaver.saveFile();
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                }
+                else{
+                    JOptionPane.showMessageDialog(frame,
+                            "You are not the manager. You have no access to file button.");
+                }
+            }
+        });
+        NewBtn.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                if (managerFlag.getFlag()){
+                    ClearSender clearSender = new ClearSender(userList, pool);
+                    clearSender.sendClearMsg();
+                }
+                else{
+                    JOptionPane.showMessageDialog(frame,
+                            "You are not the manager. You have no access to file button.");
+                }
+            }
+        });
+        OpenBtn.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                if (managerFlag.getFlag()){
+                    JFileChooser jFileChooser = new JFileChooser();
+                    int response = jFileChooser.showOpenDialog(null);
+                    if (response == JFileChooser.APPROVE_OPTION){
+                        String path = jFileChooser.getSelectedFile().getAbsolutePath();
+                        System.out.println("path: "+path);
+                        RecordReader recordReader = new RecordReader(path);
+
+                        try {
+                            recordReader.readFile();
+                            System.out.println(recordReader.getRecords().size()+" wrnm1111111111111111111");
+                            drawBoard.loadDrawing(recordReader.getRecords());
+                        } catch (ParseException ex) {
+                            throw new RuntimeException(ex);
+                        } catch (IOException ex) {
+                            throw new RuntimeException(ex);
+                        }
+                    }
+                }
+                else{
+                    JOptionPane.showMessageDialog(frame,
+                            "You are not the manager. You have no access to file button.");
+                }
+            }
+        });
+        SaveAsBtn.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                if (managerFlag.getFlag()){
+                    JFileChooser jFileChooser = new JFileChooser();
+                    int response = jFileChooser.showSaveDialog(null);
+                    if (response == JFileChooser.APPROVE_OPTION){
+                        String path = jFileChooser.getSelectedFile().getAbsolutePath();
+                        RecordSaver recordSaver = new RecordSaver(path, drawBoard.drawingRecord);
+                        try {
+                            recordSaver.saveFile();
+                        } catch (IOException ex) {
+                            throw new RuntimeException(ex);
+                        }
+                    }
+                }
+                else{
+                    JOptionPane.showMessageDialog(frame,
+                            "You are not the manager. You have no access to file button.");
+                }
             }
         });
         SendMsgButton.addMouseListener(new MouseAdapter() {

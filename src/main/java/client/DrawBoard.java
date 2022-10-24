@@ -178,18 +178,19 @@ public class DrawBoard extends JPanel {
             image = createImage(getSize().width, getSize().height);
             graphics2D = (Graphics2D) image.getGraphics();
             System.out.println("Init type: "+drawType.toString());
-            // clear();
+            clear();
         }
         graphics.drawImage(image, 0, 0, null);
     }
 
-//    private void clear() {
-//        graphics2D.setPaint(Color.white);
-//        graphics2D.fillRect(0, 0, getSize().width, getSize().height);
-//        repaint();
-//        graphics2D.setPaint(Color.black);
-//        System.out.println("clear board");
-//    }
+    public void clear() {
+        graphics2D.setPaint(Color.white);
+        graphics2D.fillRect(0, 0, getSize().width, getSize().height );
+        repaint();
+        graphics2D.setPaint(Color.black);
+        System.out.println("clear board");
+        drawingRecord.clear();
+    }
 
     public void setType(DrawType drawType){
         this.drawType = drawType;
@@ -285,9 +286,55 @@ public class DrawBoard extends JPanel {
         for (int i=0; i<records.size(); i++){
             JSONObject command = (JSONObject) parser.parse(records.get(i));
             String msgName = (String) command.get("MsgName");
-            if (Objects.equals(msgName, "SendShape")) receiveShape(command);
+            if (Objects.equals(msgName, "SendShape")){
+                String drawTypeStr = (String) command.get("drawType");
+                JSONArray colorArray = (JSONArray) command.get("colorVec");
+                int R = ((Long) colorArray.get(0)).intValue();
+                int G = ((Long) colorArray.get(1)).intValue();
+                int B = ((Long) colorArray.get(2)).intValue();
+                Color color = new Color(R,G,B);
+                JSONArray shapeVec = (JSONArray) command.get("shapeVec");
+
+                Vector<Position> vecP = new Vector<Position>();
+                for (int j=0; j<shapeVec.size(); j++){
+                    String str = (String) shapeVec.get(j);
+                    JSONObject jsPos = (JSONObject) parser.parse(str);
+                    Position pos = new Position(((Long)jsPos.get("x")).intValue(), ((Long)jsPos.get("y")).intValue());
+                    vecP.add(pos);
+                }
+                DrawType localDrawType = DrawType.Line;
+
+                switch (drawTypeStr){
+                    case "\"Line\"":
+                        localDrawType = DrawType.Line;
+                        break;
+                    case "\"Circle\"":
+                        localDrawType = DrawType.Circle;
+                        break;
+                    case "\"Rectangle\"":
+                        localDrawType = DrawType.Rectangle;
+                        break;
+                    case "\"Triangle\"":
+                        localDrawType = DrawType.Triangle;
+                        break;
+                    case "\"Text\"":
+                        localDrawType = DrawType.Text;
+                        break;
+                }
+                ShapeSender shapeSender = new ShapeSender(vecP, color, localDrawType, userList, pool);
+                shapeSender.sendShape();
+            }
             else if (Objects.equals(msgName, "SendText")) {
-                receiveText(command);
+                JSONArray colorArray = (JSONArray) command.get("colorVec");
+                int R = ((Long) colorArray.get(0)).intValue();
+                int G = ((Long) colorArray.get(1)).intValue();
+                int B = ((Long) colorArray.get(2)).intValue();
+                Color color = new Color(R,G,B);
+                int posX = Integer.parseInt(command.get("posX").toString());
+                int posY = Integer.parseInt(command.get("posY").toString());
+                String str = (String) command.get("str");
+                TextSender textSender = new TextSender(posX, posY, str, color, userList, pool);
+                textSender.sendText();
             }
         }
     }
