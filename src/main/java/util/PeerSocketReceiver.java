@@ -36,11 +36,12 @@ public class PeerSocketReceiver {
     private InetAddress serverIP;
     private int serverPort;
     private LinkedBlockingDeque<String> drawingRecord;
+    private DefaultListModel getUserlistModel;
 
 
     public PeerSocketReceiver(Socket socket, LinkedBlockingDeque<ID> userList, DrawBoard drawBoard,
                               ExecutorService pool, JFrame frame, ID managerInfo, InetAddress serverIP, int serverPort,
-                              LinkedBlockingDeque<String> drawingRecord)
+                              LinkedBlockingDeque<String> drawingRecord, DefaultListModel getUserlistModel )
             throws IOException, ParseException {
         this.socket = socket;
         this.userList = userList;
@@ -51,6 +52,7 @@ public class PeerSocketReceiver {
         this.serverIP = serverIP;
         this.serverPort = serverPort;
         this.drawingRecord = drawingRecord;
+        this.getUserlistModel = getUserlistModel;
         input = new DataInputStream(socket.getInputStream());
         output = new DataOutputStream(socket.getOutputStream());
         message = input.readUTF();
@@ -77,6 +79,12 @@ public class PeerSocketReceiver {
                 managerInfo.setIP(vecID.elementAt(0).getIP());
                 managerInfo.setPort(vecID.elementAt(0).getPort());
             }
+            getUserlistModel.clear();
+            for (int i=0; i< vecID.size(); i++){
+                getUserlistModel.addElement(vecID.elementAt(i).getUsername()+" "+vecID.elementAt(i).getIP()+" "+
+                        vecID.elementAt(i).getPort());
+            }
+
         }
         else if ((Objects.equals(MsgName, "SendShape")) || (Objects.equals(MsgName, "SendText"))){
             pool.submit(new SyncDraw(command, drawBoard));

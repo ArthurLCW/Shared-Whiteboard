@@ -2,9 +2,6 @@ package client;
 
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
-import com.intellij.uiDesigner.core.Spacer;
-import fileHandler.RecordReader;
-import fileHandler.RecordSaver;
 import org.json.simple.parser.ParseException;
 import util.*;
 
@@ -17,6 +14,7 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
+import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -29,6 +27,7 @@ public class WhiteboardFrame extends JFrame {
     private JLabel DrawChoiceLabel;
     private JRadioButton TextBtn;
     private JRadioButton ShapeBtn;
+    private JRadioButton testBtn;
     private JComboBox ShapeCombo;
     private JPanel BottomPanel;
     private JPanel BottomSubPanel0;
@@ -37,6 +36,7 @@ public class WhiteboardFrame extends JFrame {
     private JComboBox ColorCombo;
     private JPanel DrawPanel;
     private JButton CustomizedColorButton;
+    private JButton button1;
 
     private DrawType drawType;
     private static DrawBoard drawBoard;
@@ -65,6 +65,24 @@ public class WhiteboardFrame extends JFrame {
     private static JFrame frame;
     private static ID managerInfo;
 
+    private JPanel mainPanel;
+    private JList userJList;
+    private JList chatRoomJList;
+    private JTextArea MsgInput;
+    private JLabel UserListLabel;
+    private JLabel ChatRoomLabel;
+    private JButton SendMsgButton;
+    private JPanel FilePanel;
+    private JButton NewBtn;
+    private JButton SaveAsBtn;
+    private JButton OpenBtn;
+    private JButton SaveBtn;
+    private JButton KickBtn;
+    private JScrollPane UserListPane;
+    private JScrollPane ChatRoomPane;
+    static private DefaultListModel userlistModel;
+    private DefaultListModel chatRoomListModel;
+
     static {
         try {
             managerInfo = new ID("", InetAddress.getByName("localhost"), -1);
@@ -75,7 +93,8 @@ public class WhiteboardFrame extends JFrame {
 
     public WhiteboardFrame(String appName) throws UnknownHostException {
         super(appName);
-        $$$setupUI$$$();
+        setupUI();
+        // $$$setupUI$$$();
         this.frame = this;
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setContentPane(WhiteboardPanel);
@@ -218,6 +237,17 @@ public class WhiteboardFrame extends JFrame {
 
         drawBoard = new DrawBoard(pool, userList);
         DrawPanel = drawBoard;
+        initRightPanel();
+    }
+
+    public void initRightPanel() {
+        userlistModel = new DefaultListModel();
+        userJList = new JList(userlistModel);
+        UserListPane = new JScrollPane(userJList);
+
+        chatRoomListModel = new DefaultListModel();
+        chatRoomJList = new JList(chatRoomListModel);
+        ChatRoomPane = new JScrollPane(chatRoomJList);
     }
 
     private void initColorChosenBoard() {
@@ -249,6 +279,9 @@ public class WhiteboardFrame extends JFrame {
         colorChosenBackPanel.add(colorChosenBackPanel0, 0, 0);
         colorChosenBackPanel.add(colorChosenBackPanel1, 1, 1);
     }
+
+    public DefaultListModel getUserlistModel() {return userlistModel;}
+    public DefaultListModel getchatRoomListModel() {return chatRoomListModel;}
 
     int checkColorIndex(Color color) {
         int idx = -1;
@@ -310,7 +343,7 @@ public class WhiteboardFrame extends JFrame {
         IOThread ioThread = new IOThread(portMy, socketQueue, timeout); // used to receive all sockets and store in a queue
         ioThread.start();
         WorkThread workThread = new WorkThread(pool, socketQueue, userList, drawBoard, frame, managerInfo, serverIP,
-                portServer, drawBoard.drawingRecord);
+                portServer, drawBoard.drawingRecord, userlistModel);
         workThread.start();
 
 //        // TODO: wxh need to first deny/approve, then the client can request drawing record.
@@ -337,9 +370,47 @@ public class WhiteboardFrame extends JFrame {
         ColorCombo.setRenderer(new ColorRenderer());
         initColorChosenBoard();
 
-
         socketQueue = new LinkedBlockingDeque<Socket>();
     }
+
+
+
+    class ColorRenderer extends JLabel implements ListCellRenderer {
+        // color rendering inspired by https://stackoverflow.com/questions/18830098/pick-color-with-jcombobox-java-swing
+        public ColorRenderer() {
+            setOpaque(true);
+        }
+
+        boolean colorChanged = false;
+
+        @Override
+        public void setBackground(Color bg) {
+            if (!colorChanged) return;
+            super.setBackground(bg);
+        }
+
+        public Component getListCellRendererComponent(
+                JList list,
+                Object color,
+                int index,
+                boolean isSelected,
+                boolean cellHasFocus) {
+            colorChanged = true;
+            setText(" ");
+            setBackground((Color) color);
+            colorChanged = false;
+            return this;
+        }
+    }
+
+
+
+//    {
+//// GUI initializer generated by IntelliJ IDEA GUI Designer
+//// >>> IMPORTANT!! <<<
+//// DO NOT EDIT OR ADD ANY CODE HERE!
+//        setupUI();
+//    }
 
     /**
      * Method generated by IntelliJ IDEA GUI Designer
@@ -348,7 +419,7 @@ public class WhiteboardFrame extends JFrame {
      *
      * @noinspection ALL
      */
-    private void $$$setupUI$$$() {
+    private void setupUI() {
         createUIComponents();
         WhiteboardPanel = new JPanel();
         WhiteboardPanel.setLayout(new GridLayoutManager(1, 2, new Insets(0, 0, 0, 0), -1, -1));
@@ -397,14 +468,54 @@ public class WhiteboardFrame extends JFrame {
         DrawPanel.setForeground(new Color(-1));
         LeftPanel.add(DrawPanel, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_WANT_GROW, new Dimension(-1, 650), new Dimension(-1, 650), new Dimension(-1, 650), 0, false));
         DrawPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), null, TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null, null));
+
+
         RightPanel = new JPanel();
-        RightPanel.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
-        RightPanel.setBackground(new Color(-1));
-        RightPanel.setForeground(new Color(-1));
+        RightPanel.setLayout(new GridLayoutManager(8, 1, new Insets(0, 0, 0, 0), -1, -1));
         WhiteboardPanel.add(RightPanel, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, new Dimension(400, 700), new Dimension(400, 700), new Dimension(400, 700), 0, false));
-        RightPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black), null, TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null, null));
-        final Spacer spacer1 = new Spacer();
-        RightPanel.add(spacer1, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+
+        RightPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), null, TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null, null));
+
+        MsgInput = new JTextArea();
+        RightPanel.add(MsgInput, new GridConstraints(5, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_WANT_GROW, new Dimension(400, 50), new Dimension(400, 50), new Dimension(400, 50), 0, false));
+        UserListLabel = new JLabel();
+        UserListLabel.setText("User List:");
+        RightPanel.add(UserListLabel, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, new Dimension(300, 25), new Dimension(300, 25), new Dimension(300, 25), 0, false));
+        ChatRoomLabel = new JLabel();
+        ChatRoomLabel.setText("Chat Room:");
+        RightPanel.add(ChatRoomLabel, new GridConstraints(3, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, new Dimension(400, 25), new Dimension(400, 25), new Dimension(400, 25), 0, false));
+        FilePanel = new JPanel();
+        FilePanel.setLayout(new GridLayoutManager(1, 4, new Insets(0, 0, 0, 0), -1, -1));
+        RightPanel.add(FilePanel, new GridConstraints(7, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, new Dimension(400, 50), new Dimension(400, 50), new Dimension(400, 50), 0, false));
+        NewBtn = new JButton();
+        NewBtn.setText("New");
+        FilePanel.add(NewBtn, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        SaveAsBtn = new JButton();
+        SaveAsBtn.setText("Save As");
+        FilePanel.add(SaveAsBtn, new GridConstraints(0, 3, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        OpenBtn = new JButton();
+        OpenBtn.setText("Open");
+        FilePanel.add(OpenBtn, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        SaveBtn = new JButton();
+        SaveBtn.setText("Save");
+        FilePanel.add(SaveBtn, new GridConstraints(0, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        SendMsgButton = new JButton();
+        SendMsgButton.setText("Button");
+        RightPanel.add(SendMsgButton, new GridConstraints(6, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, new Dimension(400, 25), new Dimension(400, 25), new Dimension(400, 50), 0, false));
+        KickBtn = new JButton();
+        KickBtn.setText("Kick");
+        RightPanel.add(KickBtn, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, new Dimension(400, 25), new Dimension(400, 25), new Dimension(400, 25), 0, false));
+
+        // UserListPane = new JScrollPane(); // may need to be deleted!
+
+
+        RightPanel.add(UserListPane, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, new Dimension(400, 225), new Dimension(400, 225), new Dimension(400, 225), 0, false));
+
+        // ChatRoomPane = new JScrollPane(); // may need to be deleted!
+
+
+        RightPanel.add(ChatRoomPane, new GridConstraints(4, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, new Dimension(400, 225), new Dimension(400, 225), new Dimension(400, 225), 0, false));
+
     }
 
     /**
@@ -412,33 +523,5 @@ public class WhiteboardFrame extends JFrame {
      */
     public JComponent $$$getRootComponent$$$() {
         return WhiteboardPanel;
-    }
-
-    class ColorRenderer extends JLabel implements ListCellRenderer {
-        // color rendering inspired by https://stackoverflow.com/questions/18830098/pick-color-with-jcombobox-java-swing
-        public ColorRenderer() {
-            setOpaque(true);
-        }
-
-        boolean colorChanged = false;
-
-        @Override
-        public void setBackground(Color bg) {
-            if (!colorChanged) return;
-            super.setBackground(bg);
-        }
-
-        public Component getListCellRendererComponent(
-                JList list,
-                Object color,
-                int index,
-                boolean isSelected,
-                boolean cellHasFocus) {
-            colorChanged = true;
-            setText(" ");
-            setBackground((Color) color);
-            colorChanged = false;
-            return this;
-        }
     }
 }
