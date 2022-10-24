@@ -6,7 +6,6 @@ import fileHandler.RecordReader;
 import fileHandler.RecordSaver;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
-import tasks.SendClear;
 import util.*;
 
 import javax.swing.*;
@@ -14,7 +13,6 @@ import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.DataOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
@@ -22,8 +20,6 @@ import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.Objects;
-import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -102,7 +98,6 @@ public class WhiteboardFrame extends JFrame {
     public WhiteboardFrame(String appName) throws UnknownHostException {
         super(appName);
         setupUI();
-        // $$$setupUI$$$();
         this.frame = this;
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setContentPane(WhiteboardPanel);
@@ -121,8 +116,6 @@ public class WhiteboardFrame extends JFrame {
                     LeaveRequestSender leaveRequestSender = new LeaveRequestSender(leaveSocket, username, portMy);
                     LeaveRequestSender.send();
                     System.out.println("manager?"+managerInfo.getUsername());
-//                    RecordSaver recordSaver = new RecordSaver("C:\\Users\\Arthu\\Desktop\\0.whiteboard", drawBoard.drawingRecord);
-//                    int status = recordSaver.saveFile();
 
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
@@ -484,34 +477,12 @@ public class WhiteboardFrame extends JFrame {
         }
         managerFlag = new ManagerFlag();
 
-
-        // TODO: WXH: an example of how to save files, load files.
-        // not sure if loaded drawing needs to be seen by others too.....
-//        RecordSaver recordSaver = new RecordSaver("C:\\Users\\Arthu\\Desktop\\0.whiteboard", drawBoard.drawingRecord);
-//        int status = recordSaver.saveFile();
-
-        // file reader
-//        RecordReader fileReader = new RecordReader("C:\\Users\\Arthu\\Desktop\\0.whiteboard");
-//        fileReader.readFile();
-//        drawBoard.loadDrawing(fileReader.getRecords());
-//        System.out.println("Records size: "+drawBoard.drawingRecord.size());
-
-
-
         // initial socket Connecting, ask for join in permission
-//        System.out.println(InetAddress.getByName(serverIP.getHostName()));
         Socket joinInSocket = new Socket(InetAddress.getByName(serverIP.getHostName()), portServer);
         JoinInRequestSender joinInRequestSender = new JoinInRequestSender(joinInSocket, username, portMy);
         joinInRequestSender.send();
 
-        // receive the full current ip/port/name tuples
-        // TODO: wxh may need to implement "deny" function (socket and ui).
-
-
-
         socketQueue = new LinkedBlockingDeque<Socket>();
-//        userList = new LinkedBlockingDeque<ID>();
-//        LinkedBlockingDeque<ID> xx = new LinkedBlockingDeque<ID>();
 
         IOThread ioThread = new IOThread(portMy, socketQueue, timeout); // used to receive all sockets and store in a queue
         ioThread.start();
@@ -676,15 +647,7 @@ public class WhiteboardFrame extends JFrame {
         KickBtn = new JButton();
         KickBtn.setText("Kick");
         RightPanel.add(KickBtn, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, new Dimension(400, 25), new Dimension(400, 25), new Dimension(400, 25), 0, false));
-
-        // UserListPane = new JScrollPane(); // may need to be deleted!
-
-
         RightPanel.add(UserListPane, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, new Dimension(400, 225), new Dimension(400, 225), new Dimension(400, 225), 0, false));
-
-        // ChatRoomPane = new JScrollPane(); // may need to be deleted!
-
-
         RightPanel.add(ChatRoomPane, new GridConstraints(4, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, new Dimension(400, 225), new Dimension(400, 225), new Dimension(400, 225), 0, false));
 
     }

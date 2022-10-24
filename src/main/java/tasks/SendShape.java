@@ -6,7 +6,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import util.ID;
 
 import java.awt.*;
 import java.io.DataInputStream;
@@ -16,7 +15,6 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.util.Vector;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingDeque;
 
 public class SendShape implements Runnable
 {

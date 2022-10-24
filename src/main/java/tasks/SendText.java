@@ -1,8 +1,5 @@
 package tasks;
 
-import client.DrawType;
-import client.Position;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -13,7 +10,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 
 public class SendText implements Runnable

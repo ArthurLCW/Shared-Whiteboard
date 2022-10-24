@@ -6,9 +6,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.LinkedBlockingDeque;
 
 public class RecordReader {
     private String pathname;
@@ -17,13 +15,6 @@ public class RecordReader {
     public RecordReader(String pathname){
         this.pathname = pathname;
     }
-
-    //TODO: WXH may need to modify this function.
-    // Currently, this function return 0,-1,1.
-    // 1 indicates there is such file. read successfully.
-    // 0 indicates the path is incorrect. read abort.
-    // You need to modify 0 accordingly with your UI to solve the overwrite problem.
-    // Notice: the strings are stored in separate lines in the file.
 
     public int readFile() throws IOException {
         Path file  = Paths.get(pathname);

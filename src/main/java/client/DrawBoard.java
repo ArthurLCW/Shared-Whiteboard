@@ -45,10 +45,6 @@ public class DrawBoard extends JPanel {
         this.pool = pool;
         this.userList = userList;
         this.drawingRecord = new LinkedBlockingDeque<String>();
-//        image = createImage(getSize().width, getSize().height);
-//        graphics2D = (Graphics2D) image.getGraphics();
-//        this.image = image;
-//        this.graphics2D = graphics2D;
 
         addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
@@ -96,14 +92,6 @@ public class DrawBoard extends JPanel {
                     posOld.updateXY(posCur);
                     repaint();
                 }
-//                else if (drawType == DrawType.Line){
-//                    graphics2D.setColor(Color.white);
-//                    graphics2D.drawLine(posStart.getX(), posStart.getY(), posEnd.getX(), posEnd.getY());
-//                    graphics2D.setColor(drawColor);
-//                    graphics2D.drawLine(posStart.getX(), posStart.getY(), e.getX(), e.getY());
-//                    posEnd.setXY(e.getX(), e.getY());
-//                    repaint();
-//                }
 
             }
         });
@@ -112,7 +100,6 @@ public class DrawBoard extends JPanel {
                 if (drawType == DrawType.HandFree) {
                     posCur.setXY(e.getX(), e.getY());
                     freeVec.add(new Position(posCur));
-                    // for (int i = 0; i< freeVec.size(); i++) System.out.println("In freeVec: "+ freeVec.elementAt(i).getX()+" "+ freeVec.elementAt(i).getY());
                     freeVec.clear();
                 }
                 else if (drawType == DrawType.Text) {}//TODO : implement This!
@@ -127,7 +114,6 @@ public class DrawBoard extends JPanel {
                         shapeVec.add(new Position(posThird));
                     }
 
-                    // for (int i = 0; i< shapeVec.size(); i++) System.out.println("In shapeVec: "+ shapeVec.elementAt(i).getX()+" "+ shapeVec.elementAt(i).getY());
                     ShapeSender shapeSender;
                     switch (drawType){
                         case Line:
@@ -174,7 +160,6 @@ public class DrawBoard extends JPanel {
 
     protected void paintComponent(Graphics graphics) {
         if (image == null) {
-            ////////////////////////
             image = createImage(getSize().width, getSize().height);
             graphics2D = (Graphics2D) image.getGraphics();
             System.out.println("Init type: "+drawType.toString());
@@ -195,7 +180,6 @@ public class DrawBoard extends JPanel {
     public void setType(DrawType drawType){
         this.drawType = drawType;
         System.out.println("Draw type is set to be "+drawType.toString());
-        // posText.setXY(-1,-1);
         shapeVec.clear();
     }
 
@@ -225,9 +209,6 @@ public class DrawBoard extends JPanel {
             Position pos = new Position(((Long)jsPos.get("x")).intValue(), ((Long)jsPos.get("y")).intValue());
             vecP.add(pos);
         }
-
-//        System.out.println("drawTypeStr: "+drawTypeStr+" color: "+R+" "+G+" "+B+" pos vec: "
-//                +vecP.get(0).getX()+" "+vecP.get(0).getY()+" "+vecP.get(1).getX()+" "+vecP.get(1).getY());
 
         Graphics2D g2Temp = (Graphics2D) image.getGraphics();
         g2Temp.setColor(color);
@@ -263,7 +244,6 @@ public class DrawBoard extends JPanel {
 
     public void receiveText(JSONObject jsonObject) throws ParseException{
         drawingRecord.add(jsonObject.toJSONString());
-        // System.out.println("Drawing Record List length: "+drawingRecord.size());
         JSONArray colorArray = (JSONArray) jsonObject.get("colorVec");
         int R = ((Long) colorArray.get(0)).intValue();
         int G = ((Long) colorArray.get(1)).intValue();
@@ -272,7 +252,6 @@ public class DrawBoard extends JPanel {
         int posX = Integer.parseInt(jsonObject.get("posX").toString());
         int posY = Integer.parseInt(jsonObject.get("posY").toString());
         String str = (String) jsonObject.get("str");
-        // System.out.println("receiveText: "+posX+" "+posY+" "+R+" "+G+" "+B+" "+str);
 
         Graphics2D g2Temp = (Graphics2D) image.getGraphics();
         g2Temp.setColor(color);
