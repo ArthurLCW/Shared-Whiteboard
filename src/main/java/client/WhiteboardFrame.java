@@ -120,8 +120,6 @@ public class WhiteboardFrame extends JFrame {
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
                 }
-
-
                 e.getWindow().dispose();
             }
         });
@@ -174,13 +172,20 @@ public class WhiteboardFrame extends JFrame {
 
                         try {
                             recordReader.readFile();
-                            System.out.println(recordReader.getRecords().size()+" wrnm1111111111111111111");
+                            System.out.println("File lines: "+recordReader.getRecords());
                             drawBoard.loadDrawing(recordReader.getRecords());
+                            if (recordReader.getRecords().size()==0){
+                                JOptionPane.showMessageDialog(frame,
+                                        "The file you are opening has a wrong format. Please try another file.");
+                            }
                         } catch (ParseException ex) {
-                            throw new RuntimeException(ex);
+                            System.out.println(ex);
+                            JOptionPane.showMessageDialog(frame,
+                                    "The file you are opening has a wrong format. Please try another file.");
                         } catch (IOException ex) {
-                            throw new RuntimeException(ex);
-                        }
+                            System.out.println(ex);
+                            JOptionPane.showMessageDialog(frame,
+                                    "The file you are opening has a wrong format. Please try another file.");                        }
                     }
                 }
                 else{
